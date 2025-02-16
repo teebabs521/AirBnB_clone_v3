@@ -74,3 +74,42 @@ class DBStorage:
     def close(self):
         """call remove() method on the private session attribute"""
         self.__session.remove()
+
+#!/usr/bin/python3
+"""Defines the DBStorage engine."""
+from models.base_model import Base
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
+from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy import create_engine
+
+class DBStorage:
+    """Interacts with the MySQL database."""
+    __engine = None
+    __session = None
+
+    def all(self, cls=None):
+        """Returns all objects or objects of a specific class."""
+        if cls:
+            return {f"{obj.__class__.__name__}.{obj.id}": obj for obj in self.__session.query(cls).all()}
+        else:
+            objects = {}
+            for cls in [State, City, User, Place, Review, Amenity]:
+                for obj in self.__session.query(cls).all():
+                    objects[f"{obj.__class__.__name__}.{obj.id}"] = obj
+            return objects
+
+    def get(self, cls, id):
+        """Retrieves one object based on class and ID."""
+        if cls and id:
+            return self.__session.query(cls).filter_by(id=id).first()
+        return None
+
+    def count(self, cls=None):
+        """Counts the number of objects in storage."""
+        return len(self.all(cls))
+

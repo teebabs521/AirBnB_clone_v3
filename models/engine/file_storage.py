@@ -15,7 +15,6 @@ from models.user import User
 classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
            "Place": Place, "Review": Review, "State": State, "User": User}
 
-
 class FileStorage:
     """serializes instances to a JSON file & deserializes back to instances"""
 
@@ -68,3 +67,36 @@ class FileStorage:
     def close(self):
         """call reload() method for deserializing the JSON file to objects"""
         self.reload()
+
+#!/usr/bin/python3
+"""Defines the FileStorage engine."""
+import json
+from models.base_model import BaseModel
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
+
+class FileStorage:
+    """Serializes instances to a JSON file and deserializes back to instances."""
+    __file_path = "file.json"
+    __objects = {}
+
+    def all(self, cls=None):
+        """Returns a dictionary of all objects or objects of a specific class."""
+        if cls is None:
+            return self.__objects
+        return {key: obj for key, obj in self.__objects.items() if isinstance(obj, cls)}
+
+    def get(self, cls, id):
+        """Retrieves one object based on class and ID."""
+        if cls and id:
+            return self.__objects.get(f"{cls.__name__}.{id}", None)
+        return None
+
+    def count(self, cls=None):
+        """Counts the number of objects in storage."""
+        return len(self.all(cls))
+
